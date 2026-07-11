@@ -4,44 +4,28 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.eparking.parqueapp.presentation.navigation.AppNavigation
+import com.eparking.parqueapp.presentation.components.AppScaffold
 import com.eparking.parqueapp.ui.theme.ParqueAppTheme
+import com.eparking.parqueapp.di.AppContainer
 
 class MainActivity : ComponentActivity() {
+
+    private val container by lazy {
+        (application as ParqueoApplication).container
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ParqueAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "ParqueApp",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navHostController = rememberNavController()
+                AppScaffold(navHostController) { paddingValues ->
+                    AppNavigation(navHostController, container, paddingValues)
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ParqueAppTheme {
-        Greeting("Android")
     }
 }

@@ -20,5 +20,7 @@ data class ReservaHistorial(
  * Estado de la interfaz para la pantalla de Historial de Reservas.
  */
 data class ReservasUiState(
-    val reservas: List<ReservaHistorial> = emptyList()
+    val reservas: List<ReservaHistorial> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 )

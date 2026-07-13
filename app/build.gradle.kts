@@ -56,6 +56,11 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
 
+    // Retrofit para consumo del API REST (AWS)
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

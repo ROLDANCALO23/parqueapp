@@ -2,6 +2,7 @@ package com.eparking.parqueapp.presentation.viewmodel.perfil
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eparking.parqueapp.core.session.SesionUsuario
 import com.eparking.parqueapp.presentation.event.EventBus
 import com.eparking.parqueapp.presentation.event.UiEvent
 import com.eparking.parqueapp.presentation.screens.perfil.PerfilUiState
@@ -12,6 +13,17 @@ import kotlinx.coroutines.launch
 class PerfilViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(PerfilUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        // Refleja el usuario logueado actualmente; se re-ejecuta si cambia (ej. otro login).
+        viewModelScope.launch {
+            SesionUsuario.usuarioActual.collect { usuario ->
+                if (usuario != null) {
+                    _uiState.value = _uiState.value.copy(nombre = usuario.nombre, email = usuario.email)
+                }
+            }
+        }
+    }
 
     fun onNombreChange(valor: String) {
         _uiState.value = _uiState.value.copy(nombre = valor)

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,6 +34,13 @@ import com.eparking.parqueapp.presentation.viewmodel.perfil.LoginViewModel
 fun LoginScreen(viewModel: LoginViewModel, navController: NavHostController) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
+
+    LaunchedEffect(uiState.loginExitoso) {
+        if (uiState.loginExitoso) {
+            navController.navigate(NavRutas.MAPA)
+            viewModel.onNavegacionConsumida()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -130,10 +138,7 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavHostController) {
         // 4. Botón de Ingreso
         ParqueaButton(
             text = "Iniciar Sesión",
-            onClick = { 
-                viewModel.onLoginClick() 
-                navController.navigate(NavRutas.MAPA)
-            },
+            onClick = { viewModel.onLoginClick() },
             trailingIcon = Icons.AutoMirrored.Filled.ArrowForward
         )
 

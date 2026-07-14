@@ -10,7 +10,7 @@ import com.eparking.parqueapp.domain.repository.ReservaRepository
  */
 class RepositoryModule(private val apiService: ApiService) {
     
-    private val remoteDataSource by lazy {
+    val remoteDataSource by lazy {
         RemoteDataSource(apiService)
     }
 

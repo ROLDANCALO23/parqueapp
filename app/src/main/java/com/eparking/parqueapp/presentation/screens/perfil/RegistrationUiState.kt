@@ -8,5 +8,5 @@ data class RegistrationUiState(
     val email: String = "",
     val telefono: String = "",
     val password: String = "",
-    val confirmPassword: String = ""
+    val registroExitoso: Boolean = false
 )

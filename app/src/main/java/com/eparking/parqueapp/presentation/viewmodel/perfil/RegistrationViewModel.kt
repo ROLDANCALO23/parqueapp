@@ -2,14 +2,16 @@ package com.eparking.parqueapp.presentation.viewmodel.perfil
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eparking.parqueapp.data.remote.datasource.RemoteDataSource
 import com.eparking.parqueapp.presentation.event.EventBus
 import com.eparking.parqueapp.presentation.event.UiEvent
 import com.eparking.parqueapp.presentation.screens.perfil.RegistrationUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 
-class RegistrationViewModel : ViewModel() {
+class RegistrationViewModel(private val remoteDataSource: RemoteDataSource) : ViewModel() {
     private val _uiState = MutableStateFlow(RegistrationUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -29,19 +31,35 @@ class RegistrationViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(password = valor)
     }
 
-    fun onConfirmPasswordChange(valor: String) {
-        _uiState.value = _uiState.value.copy(confirmPassword = valor)
-    }
-
     fun onRegistroClick() {
         viewModelScope.launch {
             if (!validarFormulario()) {
                 return@launch
             }
-            
+
             val data = _uiState.value
-            println("Registrando usuario: ${data.nombre} con teléfono ${data.telefono}")
-            EventBus.send(UiEvent.Success("¡Registro completado con éxito!"))
+            
+            try {
+                val response = remoteDataSource.registrarUsuario(
+                    data.nombre,
+                    data.email,
+                    data.telefono,
+                    data.password
+                )
+
+                if (response.isSuccessful) {
+                    EventBus.send(UiEvent.Success("¡Registro completado con éxito!"))
+                    _uiState.value = _uiState.value.copy(registroExitoso = true)
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    println("Error en Registro: $errorBody")
+                    EventBus.send(UiEvent.Error("Error al registrar: ${response.code()}"))
+                }
+            } catch (e: IOException) {
+                EventBus.send(UiEvent.Error("No se pudo conectar al servidor"))
+            } catch (e: Exception) {
+                EventBus.send(UiEvent.Error("Ocurrió un error inesperado"))
+            }
         }
     }
 
@@ -62,10 +80,6 @@ class RegistrationViewModel : ViewModel() {
             }
             state.password.isBlank() -> {
                 EventBus.send(UiEvent.Warning("Ingrese una contraseña"))
-                false
-            }
-            state.password != state.confirmPassword -> {
-                EventBus.send(UiEvent.Warning("Las contraseñas no coinciden"))
                 false
             }
             else -> true

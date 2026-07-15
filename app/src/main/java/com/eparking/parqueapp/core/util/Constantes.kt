@@ -5,4 +5,5 @@ object Constantes {
 
     // API de autenticación (apiUsuarios -> funUsuarios -> DynamoDB "usuarios")
     const val LOGIN_URL = "https://4r5nct4v0l.execute-api.us-east-1.amazonaws.com/login"
+    const val REGISTER_URL = "https://rlbm76m6nj.execute-api.us-east-1.amazonaws.com/usuarios"
 }

@@ -1,4 +1,4 @@
-import { GetCommand } from "@aws-sdk/lib-dynamodb";
+import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { ddb } from "../config/dynamo.mjs";
 
 const TABLE = process.env.TABLE_NAME;

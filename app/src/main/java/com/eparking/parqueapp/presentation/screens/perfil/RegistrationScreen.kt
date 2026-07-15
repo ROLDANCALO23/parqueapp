@@ -5,13 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,6 +31,14 @@ fun RegistrationScreen(viewModel: RegistrationViewModel, navController: NavHostC
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
 
+    LaunchedEffect(uiState.registroExitoso) {
+        if (uiState.registroExitoso) {
+            navController.navigate(NavRutas.MAPA) {
+                popUpTo(NavRutas.REGISTRO) { inclusive = true }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -42,9 +47,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel, navController: NavHostC
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 1. Encabezado con imagen
         AuthHeader(
-            image = painterResource(id = R.drawable.ic_launcher_background), // Reemplazar con la imagen real del parking
+            image = painterResource(id = R.drawable.ic_launcher_background),
             title = "Datos Personales",
             subtitle = "Comencemos con tu información básica para crear tu perfil.",
             isLogo = false
@@ -52,12 +56,10 @@ fun RegistrationScreen(viewModel: RegistrationViewModel, navController: NavHostC
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 2. Formulario de Registro
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Nombre Completo
             ParqueaTextField(
                 value = uiState.nombre,
                 onValueChange = { viewModel.onNombreChange(it) },
@@ -65,7 +67,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel, navController: NavHostC
                 leadingIcon = Icons.Default.Person
             )
 
-            // Correo Electrónico
             ParqueaTextField(
                 value = uiState.email,
                 onValueChange = { viewModel.onEmailChange(it) },
@@ -74,7 +75,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel, navController: NavHostC
                 keyboardType = KeyboardType.Email
             )
 
-            // Celular con prefijo +51
             ParqueaTextField(
                 value = uiState.telefono,
                 onValueChange = { viewModel.onTelefonoChange(it) },
@@ -84,7 +84,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel, navController: NavHostC
                 keyboardType = KeyboardType.Phone
             )
 
-            // Contraseña
             ParqueaTextField(
                 value = uiState.password,
                 onValueChange = { viewModel.onPasswordChange(it) },
@@ -96,21 +95,14 @@ fun RegistrationScreen(viewModel: RegistrationViewModel, navController: NavHostC
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 3. Botón de Registro
         ParqueaButton(
             text = "Completar Registro",
-            onClick = { 
-                viewModel.onRegistroClick() 
-                navController.navigate(NavRutas.MAPA) {
-                    popUpTo(NavRutas.REGISTRO) { inclusive = true }
-                }
-            },
+            onClick = { viewModel.onRegistroClick() },
             trailingIcon = Icons.Default.CheckCircle
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 4. Enlace a Login
         AuthClickableText(
             normalText = "¿Ya tienes una cuenta?",
             clickableText = "Iniciar Sesión",

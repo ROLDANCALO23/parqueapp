@@ -29,7 +29,7 @@ class AppContainer {
     // 4. Capa Presentation / ViewModels
     val loginViewModel by lazy { LoginViewModel(repositoryModule.remoteDataSource) }
 
-    val registrationViewModel by lazy { RegistrationViewModel() }
+    val registrationViewModel by lazy { RegistrationViewModel(repositoryModule.remoteDataSource) }
 
     val perfilViewModel by lazy { PerfilViewModel() }
 

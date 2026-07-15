@@ -4,6 +4,7 @@ import com.eparking.parqueapp.data.remote.dto.ApiResponse
 import com.eparking.parqueapp.data.remote.dto.InsertarReservaRequest
 import com.eparking.parqueapp.data.remote.dto.LoginRequest
 import com.eparking.parqueapp.data.remote.dto.LoginResponse
+import com.eparking.parqueapp.data.remote.dto.RegisterRequest
 import com.eparking.parqueapp.data.remote.dto.ReservaDetalleResponse
 import com.eparking.parqueapp.data.remote.dto.ReservaDto
 import retrofit2.Response
@@ -32,4 +33,7 @@ interface ApiService {
 
     @DELETE("dev/reservas/{id}")
     suspend fun eliminarReserva(@Path("id") id: String): Response<Unit>
+
+    @POST
+    suspend fun registrarUsuario(@Url url: String, @Body request: RegisterRequest): Response<ApiResponse<Unit>>
 }

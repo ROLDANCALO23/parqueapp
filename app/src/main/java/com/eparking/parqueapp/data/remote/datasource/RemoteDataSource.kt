@@ -5,6 +5,7 @@ import com.eparking.parqueapp.core.network.ApiService
 import com.eparking.parqueapp.core.util.Constantes
 import com.eparking.parqueapp.data.remote.dto.InsertarReservaRequest
 import com.eparking.parqueapp.data.remote.dto.LoginRequest
+import com.eparking.parqueapp.data.remote.dto.RegisterRequest
 
 /**
  * Fuente de datos remota. Maneja las peticiones de red.
@@ -31,4 +32,10 @@ class RemoteDataSource(private val apiService: ApiService) {
     suspend fun actualizarReserva(id: String, req: InsertarReservaRequest) = apiService.actualizarReserva(id, req)
     
     suspend fun eliminarReserva(id: String) = apiService.eliminarReserva(id)
+
+    // función de registro usuarios
+
+    suspend fun registrarUsuario(nombre: String, email: String, telefono: String, password: String) =
+        apiService.registrarUsuario(Constantes.REGISTER_URL, RegisterRequest(nombre, email, telefono, password))
 }
+

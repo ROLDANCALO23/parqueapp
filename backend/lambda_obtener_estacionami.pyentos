@@ -1,0 +1,71 @@
+import json
+import uuid
+import base64
+import boto3
+from decimal import Decimal
+
+dynamodb = boto3.resource('dynamodb')
+tabla = dynamodb.Table('estacionamientos')
+
+HEADERS = {'Content-Type': 'application/json'}
+
+
+def decimal_a_numero(obj):
+    """DynamoDB devuelve números como Decimal; hay que convertirlos para json.dumps."""
+    if isinstance(obj, Decimal):
+        return float(obj) if obj % 1 != 0 else int(obj)
+    raise TypeError
+
+
+def respuesta_json(status, cuerpo):
+    return {
+        'statusCode': status,
+        'headers': HEADERS,
+        'body': json.dumps(cuerpo, default=decimal_a_numero, ensure_ascii=False)
+    }
+
+
+def lambda_handler(event, context):
+    metodo = event['requestContext']['http']['method']
+
+    try:
+        if metodo == 'POST':
+            return crear_estacionamiento(event)
+        if metodo == 'GET':
+            return listar_estacionamientos()
+        return respuesta_json(405, {'error': f'Método {metodo} no permitido'})
+    except json.JSONDecodeError:
+        return respuesta_json(400, {'error': 'El body no es JSON válido'})
+    except Exception as e:
+        return respuesta_json(500, {'error': str(e)})
+
+
+def listar_estacionamientos():
+    respuesta = tabla.scan()
+    items = respuesta.get('Items', [])
+    while 'LastEvaluatedKey' in respuesta:
+        respuesta = tabla.scan(ExclusiveStartKey=respuesta['LastEvaluatedKey'])
+        items.extend(respuesta.get('Items', []))
+
+    items.sort(key=lambda r: r.get('nombre', ''))
+    return respuesta_json(200, items)
+
+
+def crear_estacionamiento(event):
+    body_crudo = event.get('body') or '{}'
+    if event.get('isBase64Encoded'):
+        body_crudo = base64.b64decode(body_crudo).decode('utf-8')
+
+    # parse_float=Decimal porque DynamoDB no acepta float de Python
+    body = json.loads(body_crudo, parse_float=Decimal)
+
+    obligatorios = ['nombre', 'direccion', 'latitud', 'longitud']
+    faltantes = [c for c in obligatorios if body.get(c) in (None, '')]
+    if faltantes:
+        return respuesta_json(400, {'error': f'Faltan campos: {", ".join(faltantes)}'})
+
+    if 'id_estacionamiento' not in body:
+        body['id_estacionamiento'] = str(uuid.uuid4())
+
+    tabla.put_item(Item=body)
+    return respuesta_json(201, body)
